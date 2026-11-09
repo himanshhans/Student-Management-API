@@ -1,0 +1,26 @@
+
+# Virtual environment
+venv/
+env/
+
+# Environment variables
+.env
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Python cache
+__pycache__/
+*.pyc
+
+.ipynb_checkpoints/
+
+.vscode/
+
+student_api_project_work_task.txt
+
+tests/
+tests/test_db.py
+tests/test_logging.py
