@@ -4,3 +4,33 @@
 2026-11-05 15:35:33,033 - INFO - Test INFO message
 2026-11-05 15:35:33,145 - WARNING - Test WARNING message
 2026-11-05 15:35:33,163 - ERROR - Test ERROR message
+2026-11-10 01:11:50,830 - INFO - 
+2026-11-10 01:11:54,157 - INFO - 
+2026-11-10 01:11:59,810 - INFO - Record with id
+2026-11-10 01:12:04,245 - INFO - Record with id: {id}
+2026-11-10 01:12:06,259 - INFO - Record with id: {id} 
+2026-11-10 01:12:08,602 - INFO - Record with id: {id} 
+2026-11-10 01:12:15,590 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:12:25,953 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:12:28,107 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:12:33,285 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:12:42,990 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:12:52,866 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:13:52,720 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:14:09,684 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:14:12,455 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:14:22,947 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:14:32,317 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:14:48,945 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:14:54,232 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:15:01,444 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:15:07,817 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:15:10,168 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:15:20,793 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:15:31,922 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:15:40,090 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:15:56,131 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:16:05,915 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:16:09,443 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:16:19,552 - INFO - Record with id: {id} was deleted successfully
+2026-11-10 01:16:24,389 - INFO - Record with id: {id} was deleted successfully

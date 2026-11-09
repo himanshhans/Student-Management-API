@@ -41,6 +41,8 @@ def get_all_students(page: int = Query(default=1, ge=1),
                     sort: str = Query(default="id"),
                     include_inactive: bool = Query(default=False)
                 ):
+    connection = None
+    cursor = None
     try:
         conditions = []
         values = []
@@ -54,6 +56,7 @@ def get_all_students(page: int = Query(default=1, ge=1),
         if sort_dsc is True:
             asc_or_dsc = "DESC"
         if sort_col_name not in sort_by:
+            logger.warning(f"User tried to sort by {sort_col_name} which is invalid!")
             raise HTTPException(
                 status_code=400,
                 detail="You can only sort by id, first_name, last_name or roll_no"
@@ -80,8 +83,11 @@ def get_all_students(page: int = Query(default=1, ge=1),
         total_dict = cursor.fetchone()
         total = total_dict["total"]
     finally:
-        cursor.close()
-        connection.close()
+        if cursor is not None:
+            cursor.close()
+        if connection is not None:
+            connection.close()
+    logger.info(f"User successfully accessed page: {page} and a total of {total} records were retrieved")
     return {
         "items": items,
         "page": page,
