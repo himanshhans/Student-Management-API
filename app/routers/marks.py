@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.database import get_connection
 from app.schemas.marks import MarksCreate, MarksOut, MarksUpdate
 from app.utils.logger import logger
+from app.utils.security import get_authenticated_user, require_admin
 import mysql.connector
 
 router = APIRouter(
@@ -9,13 +10,13 @@ router = APIRouter(
 )
 
 @router.post("/students/{student_id}/marks", response_model=MarksOut, status_code=201) #this establishes an api level relationship between marks and students
-def enter_marks(student_id: int, marks: MarksCreate):
+def enter_marks(student_id: int, marks: MarksCreate, user = Depends(require_admin)):
     connection = None
     cursor = None
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM students WHERE id = %s;", (student_id,))
+        cursor.execute("SELECT * FROM students WHERE id = %s AND school_id = %s;", (student_id, user["school_id"]))
         is_student = cursor.fetchone()
         if is_student is None:
             logger.warning("Error! User tried to add record for a non existing student")
@@ -37,13 +38,13 @@ def enter_marks(student_id: int, marks: MarksCreate):
     return inserted_marks
 
 @router.get("/students/{student_id}/marks", response_model=list[MarksOut])
-def get_marks(student_id: int):
+def get_marks(student_id: int, user = Depends(get_authenticated_user)):
     connection = None
     cursor = None
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM students WHERE id = %s;", (student_id,))
+        cursor.execute("SELECT * FROM students WHERE id = %s AND school_id = %s;", (student_id, user["school_id"]))
         is_student = cursor.fetchone()
         if is_student is None:
             logger.warning("User tried to access non existent record")
@@ -62,13 +63,18 @@ def get_marks(student_id: int):
     return marks_list
 
 @router.patch("/marks/{id}", response_model=MarksOut)
-def update_marks(id: int, marks: MarksUpdate):
+def update_marks(id: int, marks: MarksUpdate, user = Depends(require_admin)):
     connection = None
     cursor = None
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM marks WHERE id = %s;", (id,))
+        cursor.execute("""
+            SELECT marks.*
+            FROM marks
+            JOIN students ON marks.student_id = students.id
+            WHERE marks.id = %s AND students.school_id = %s;
+        """, (id, user["school_id"]))
         is_marks =  cursor.fetchone()
 
         if is_marks is None:
@@ -132,13 +138,18 @@ def update_marks(id: int, marks: MarksUpdate):
     return updated_marks
 
 @router.delete("/marks/{id}", status_code=204)
-def delete_marks(id: int):
+def delete_marks(id: int, user = Depends(require_admin)):
     connection = None
     cursor = None
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM marks WHERE id = %s;", (id,))
+        cursor.execute("""
+            SELECT marks.*
+            FROM marks
+            JOIN students ON marks.student_id = students.id
+            WHERE marks.id = %s AND students.school_id = %s;
+        """, (id, user["school_id"]))
         is_marks =  cursor.fetchone()
         if is_marks is None:
             logger.warning("User tried to access non existent record")
@@ -153,4 +164,4 @@ def delete_marks(id: int):
             cursor.close()
         if connection is not None:
             connection.close()
-logger.info("Record with id: {id} was deleted successfully")
+    logger.info(f"Record with id: {id} was deleted successfully")

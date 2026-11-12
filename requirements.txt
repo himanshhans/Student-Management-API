@@ -4,3 +4,5 @@ pydantic
 mysql-connector-python
 python-dotenv
 pytest
+bcrypt
+python-jose[cryptography]

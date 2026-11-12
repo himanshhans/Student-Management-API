@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from app.database import get_connection
 from app.schemas.student import StudentCreate, StudentOut, StudentUpdate, StudentListResponse
 from app.utils.logger import logger
+from app.utils.security import get_authenticated_user, require_admin
 import mysql.connector
 
 router = APIRouter(
@@ -10,7 +11,7 @@ router = APIRouter(
 )
 
 @router.post("/", response_model=StudentOut, status_code=201)
-def create_student(student: StudentCreate):
+def create_student(student: StudentCreate, user = Depends(require_admin)):
     connection = None
     cursor = None
     try:
@@ -39,13 +40,16 @@ def get_all_students(page: int = Query(default=1, ge=1),
                     class_name: int | None = Query(default=None, alias="class", ge=1, le=12),
                     section: str | None = Query(default=None),
                     sort: str = Query(default="id"),
-                    include_inactive: bool = Query(default=False)
+                    include_inactive: bool = Query(default=False),
+                    authenticated_user = Depends(get_authenticated_user)
                 ):
     connection = None
     cursor = None
     try:
         conditions = []
         values = []
+        conditions.append("school_id = %s")
+        values.append(authenticated_user["school_id"])
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
 
@@ -96,11 +100,11 @@ def get_all_students(page: int = Query(default=1, ge=1),
     }
 
 @router.get("/{student_id}", response_model=StudentOut)
-def get_student(student_id: int):
+def get_student(student_id: int, user = Depends(get_authenticated_user)):
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM students WHERE id = %s;", (student_id,))
+        cursor.execute("SELECT * FROM students WHERE id = %s AND school_id = %s;", (student_id, user["school_id"]))
         student = cursor.fetchone()
     except Exception as e:
         logger.exception("Failed to fetch Student Record")
@@ -121,7 +125,7 @@ def get_student(student_id: int):
     return student
 
 @router.put("/{student_id}", response_model=StudentOut)
-def update_student_completely(student_id: int, student: StudentCreate):
+def update_student_completely(student_id: int, student: StudentCreate, user = Depends(require_admin)):
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
@@ -146,7 +150,7 @@ def update_student_completely(student_id: int, student: StudentCreate):
     return updated_student
 
 @router.patch("/{student_id}", response_model=StudentOut)
-def update_student(student_id: int, student: StudentUpdate):
+def update_student(student_id: int, student: StudentUpdate, user = Depends(require_admin)):
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
@@ -184,7 +188,7 @@ def update_student(student_id: int, student: StudentUpdate):
     return updated_student
 
 @router.delete("/{student_id}", status_code=200)
-def soft_delete(student_id: int):
+def soft_delete(student_id: int, user = Depends(require_admin)):
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
